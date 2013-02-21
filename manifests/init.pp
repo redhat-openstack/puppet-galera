@@ -52,13 +52,13 @@ class galera(
     }
 
     exec { "download-wsrep" :
-        command     => "wget -O /tmp/mysql-server-wsrep-5.5.23-23.6-amd64.deb http://launchpad.net/codership-mysql/5.5/5.5.23-23.6/+download/mysql-server-wsrep-5.5.23-23.6-amd64.deb",
+        command     => "wget -O /tmp/mysql-server-wsrep-5.5.23-23.6-amd64.deb http://launchpad.net/codership-mysql/5.5/5.5.23-23.6/+download/mysql-server-wsrep-5.5.23-23.6-amd64.deb --no-check-certificate",
         path        => '/usr/bin:/usr/sbin:/bin:/sbin',
 	creates     => "/tmp/mysql-server-wsrep-5.5.23-23.6-amd64.deb",
     }
 
     exec { "download-galera" :
-        command     => "wget -O /tmp/galera-23.2.1-amd64.deb http://launchpad.net/galera/2.x/23.2.1/+download/galera-23.2.1-amd64.deb",
+        command     => "wget -O /tmp/galera-23.2.1-amd64.deb http://launchpad.net/galera/2.x/23.2.1/+download/galera-23.2.1-amd64.deb --no-check-certificate",
         path        => '/usr/bin:/usr/sbin:/bin:/sbin',
 	creates     => "/tmp/galera-23.2.1-amd64.deb",
     }
