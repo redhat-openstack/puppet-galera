@@ -31,7 +31,7 @@ query_cache_type=0
 # Override bind-address
 # In some systems bind-address defaults to 127.0.0.1, and with mysqldump SST
 # it will have (most likely) disastrous consequences on donor node
-bind-address=0.0.0.0
+bind-address=<%= @wsrep_bind_address %>
 
 ##
 ## WSREP options
@@ -44,11 +44,11 @@ wsrep_provider=/usr/lib/galera/libgalera_smm.so
 #wsrep_provider_options=
 
 # Logical cluster name. Should be the same for all nodes.
-wsrep_cluster_name="<%=cluster_name-%>"
+wsrep_cluster_name="<%= @cluster_name %>"
 
 # Group communication system handle
-<% if master_ip -%>
-wsrep_cluster_address="gcomm://<%= master_ip %>"
+<% if @master_ip -%>
+wsrep_cluster_address="gcomm://<%= @master_ip %>"
 <% else -%>
 wsrep_cluster_address="gcomm://"
 <% end -%>
@@ -112,7 +112,7 @@ wsrep_notify_cmd=
 ##
 
 # State Snapshot Transfer method
-wsrep_sst_method=rsync
+wsrep_sst_method=<%= @wsrep_sst_method %>
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
@@ -120,7 +120,7 @@ wsrep_sst_method=rsync
 
 # SST authentication string. This will be used to send SST to joining nodes.
 # Depends on SST method. For mysqldump method it is root:<root password>
-wsrep_sst_auth=wsrep_sst:password
+wsrep_sst_auth=<%= @wsrep_sst_username %>:<%= @wsrep_sst_password %>
 
 # Desired SST donor name.
 #wsrep_sst_donor=

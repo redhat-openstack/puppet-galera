@@ -1,0 +1,10 @@
+name    'Ciscosystems-galera'
+version '0.0.1'
+source  'https://github.com/CiscoSystems/puppet-galera'
+author  'Puppet Labs'
+license 'Apache License 2.0'
+summary 'CiscoSystems Gerala  Module'
+description  'This module configures galera to suppot multi-master mysql. It was originally written to provide multi master capabilities for Cisco's openstack HA solution'
+project_page 'https://github.com/CiscoSystems/puppet-galera'
+
+dependency 'puppetlabs/mysql', '>= 0.8.1'
