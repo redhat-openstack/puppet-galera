@@ -11,15 +11,15 @@
 # The purpose of this script is make haproxy capable of monitoring mysql properly
 #
 
-MYSQL_HOST="<%= mysql_host %>"
-MYSQL_PORT="<%= mysql_port %>"
-MYSQL_USERNAME="<%= mysqlchk_user%>"
-MYSQL_PASSWORD="<%= mysqlchk_password %>"
+MYSQL_HOST="<%= @monitor_hostname %>"
+MYSQL_PORT="<%= @mysql_port %>"
+MYSQL_USERNAME="<%= @monitor_username %>"
+MYSQL_PASSWORD="<%= @monitor_password %>"
 MYSQL_OPTS="-N -q -A"
 TMP_FILE="/dev/shm/mysqlchk.$$.out"
 ERR_FILE="/dev/shm/mysqlchk.$$.err"
 FORCE_FAIL="/dev/shm/proxyoff"
-MYSQL_BIN="<%= mysql_bin_dir %>"
+MYSQL_BIN="<%= @mysql_bin_dir %>"
 CHECK_QUERY="show global status where variable_name='wsrep_local_state'"
 preflight_check()
 {
