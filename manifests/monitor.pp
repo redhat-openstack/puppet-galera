@@ -117,7 +117,7 @@ class galera::monitor(
   # Create a user for MySQL Galera health check script.
   database_user{ "${monitor_username}@${monitor_hostname}":
     ensure        => present,
-    password_hash => mysql_password(monitor_password),
+    password_hash => mysql_password($monitor_password),
     require       => [File['/root/.my.cnf'],Service['mysqld']],
   }
 
