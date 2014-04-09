@@ -1,120 +1,72 @@
 # Class: galera::server
 #
-# manages the installation of the mysql wsrep and galera.
-# manages the package, service, wsrep.cnf
+# manages the installation of the galera server.
+# manages the package, service, galera.cnf
 #
 # Parameters:
-#  [*config_hash*]         - hash of config parameters that need to be set.
-#  [*enabled*]             - Defaults to true, boolean to set service ensure.
-#  [*manage_service*]      - Boolean dictating if mysql::server should manage the service.
-#  [*root_group]           - use specified group for root-owned files.
-#  [*package_ensure*]      - Ensure state for package. Can be specified as version.
-#  [*galera_package_name*] - The name of the galera package.
-#  [*wsrep_package_name*]  - The name of the wsrep package.
-#  [*libaio_package_name*] - The name of the libaio package.
-#  [*libssl_package_name*] - The name of the libssl package.
-#  [*wsrep_deb_name*]      - The name of wsrep .deb file.
-#  [*galera_deb_name*]     - The name of galera .deb file.
-#  [*wsrep_deb_name*]      - The URL to download the wsrep .deb file.
-#  [*galera_deb_name*]     - The URL to download the galera .deb file.
-#  [*galera_package_name*] - The name of the Galera package.
-#  [*wsrep_package_name*]  - The name of the WSREP package.
-#  [*cluster_name*]        - Logical cluster name. Should be the same for all nodes.
-#  [*master_ip*]           - IP address of the group communication system handle.
-#    The first node in the cluster should be left as the default (false) until the cluster is formed.
-#    Additional nodes in the cluster should have an IP address set to a node in the cluster.
-#  [*wsrep_sst_username*]  - Username used by the wsrep_sst_auth authentication string.
-#    Used to secure the communication between cluster members.
-#  [*wsrep_sst_password*]  - Password used by the wsrep_sst_auth authentication string.
-#    Used to secure the communication between cluster members.
-#  [*wsrep_sst_method*]    - WSREP state snapshot transfer method.
-#    Defaults to 'mysqldump'.  Note: 'rsync' is the most widely tested.
+#  [*config_hash*]           - Hash of config parameters that need to be set.
+#  [*enabled*]               - Defaults to true, boolean to set service ensure.
+#  [*manage_service*]        - Boolean dictating if galera::server should manage the service.
+#  [*package_ensure*]        - Ensure state for package. Can be specified as version.
+#  [*package_name*]          - The name of the galera package.
+#  [*service_name*]          - The name of the galera service.
+#  [*service_provider*]      - What service provider to use.
+#  [*wsrep_bind_address*]    - Address to bind galera service.
+#  [*wsrep_provider*]        - Full path to wsrep provider library or 'none'.
+#  [*wsrep_cluster_name*]    - Logical cluster name. Should be the same for all nodes.
+#  [*wsrep_cluster_address*] - Group communication system handle.
+#  [*wsrep_sst_method*]      - State snapshot transfer method.
+#  [*wsrep_sst_username*]    - Username used by the wsrep_sst_auth authentication string.
+#  [*wsrep_sst_password*]    - Password used by the wsrep_sst_auth authentication string.
+#
+# Actions:
 #
 # Requires:
 #
 # Sample Usage:
-# class { 'mysql::server::galera':
+# class { 'galera::server':
 #   config_hash => {
 #     'root_password' => 'root_pass',
 #   },
-#    cluster_name       => 'galera_cluster',
-#    master_ip          => false,
-#    wsrep_sst_username => 'ChangeMe',
-#    wsrep_sst_password => 'ChangeMe',
-#    wsrep_sst_method   => 'rsync'
-#  }
+#   cluster_name       => 'galera_cluster',
+#   wsrep_sst_method   => 'rsync'
+#   wsrep_sst_username => 'ChangeMe',
+#   wsrep_sst_password => 'ChangeMe',
+# }
 #
 class galera::server (
-  $config_hash         = {},
-  $enabled             = true,
-  $manage_service      = true,
-  $root_group          = $mysql::root_group,
-  $package_ensure      = $mysql::package_ensure,
-  $galera_package_name = 'galera',
-  $wsrep_package_name  = 'mysql-server-wsrep',
-  $libaio_package_name = 'libaio1',
-  $libssl_package_name = 'libssl0.9.8',
-  $wsrep_deb_name      = 'mysql-server-wsrep-5.5.23-23.6-amd64.deb',
-  $wsrep_deb_source    = 'http://launchpad.net/codership-mysql/5.5/5.5.23-23.6/+download/mysql-server-wsrep-5.5.23-23.6-amd64.deb',
-  $galera_deb_name     = 'galera-23.2.1-amd64.deb',
-  $galera_deb_source   = 'http://launchpad.net/galera/2.x/23.2.1/+download/galera-23.2.1-amd64.deb',
-  $wsrep_bind_address  = '0.0.0.0',
-  $cluster_name        = 'wsrep',
-  $master_ip           = false,
-  $wsrep_sst_username  = 'wsrep_user',
-  $wsrep_sst_password  = 'wsrep_pass',
-  $wsrep_sst_method    = 'mysql_dump'
+  $config_hash           = {},
+  $enabled               = true,
+  $manage_service        = true,
+  $package_ensure        = 'present',
+  $package_name          = 'mariadb-galera-server',
+  $service_name          = $mysql::params::service_name,
+  $service_provider      = $mysql::params::service_provider,
+  $wsrep_bind_address    = '0.0.0.0',
+  $wsrep_provider        = '/usr/lib64/galera/libgalera_smm.so',
+  $wsrep_cluster_name    = 'galera_cluster',
+  $wsrep_cluster_address = 'gcomm://',
+  $wsrep_sst_method      = 'rsync',
+  $wsrep_sst_username    = 'root',
+  $wsrep_sst_password    = undef,
 ) inherits mysql {
 
   $config_class = { 'mysql::config' => $config_hash }
 
   create_resources( 'class', $config_class )
 
-  exec { 'download-wsrep':
-    command => "wget -O /tmp/${wsrep_deb_name} ${wsrep_deb_source} --no-check-certificate",
-    path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-    creates => "/tmp/${wsrep_deb_name}",
-  }
-
-  exec { 'download-galera':
-    command => "wget -O /tmp/${galera_deb_name} ${galera_deb_source} --no-check-certificate",
-    path    => '/usr/bin:/usr/sbin:/bin:/sbin',
-    creates => "/tmp/${galera_deb_name}",
-  }
-
-  package { 'wsrep':
-    ensure   => $package_ensure,
-    name     => $wsrep_package_name,
-    provider => 'dpkg',
-    require  => [Exec['download-wsrep'],Package['libaio','libssl']],
-    source   => "/tmp/${wsrep_deb_name}",
-  }
-
   package { 'galera':
-    ensure   => $package_ensure,
-    name     => $galera_package_name,
-    provider => 'dpkg',
-    require  => [Exec['download-galera'],Package['wsrep']],
-    source   => "/tmp/${galera_deb_name}",
+    ensure => $package_ensure,
+    name   => $package_name,
   }
 
-  package { 'libaio' :
-    ensure   => $package_ensure,
-    name     => $libaio_package_name
-  }
-
-  package { 'libssl' :
-    ensure   => $package_ensure,
-    name     => $libssl_package_name
-  }
-
-  file { '/etc/mysql/conf.d/wsrep.cnf' :
+  file { '/etc/my.cnf.d/galera.cnf':
     ensure  => present,
     mode    => '0644',
     owner   => 'root',
-    group   => $root_group,
+    group   => 'root',
     content => template('galera/wsrep.cnf.erb'),
-    notify  => Service['mysqld']
+    notify  => Service['galera'],
   }
 
   if $enabled {
@@ -124,12 +76,14 @@ class galera::server (
   }
 
   if $manage_service {
-    Service['mysqld'] -> Exec<| title == 'set_mysql_rootpw' |>
-    service { 'mysqld':
+    Service['galera'] -> Exec<| title == 'set_mysql_rootpw' |>
+
+    service { 'galera':
       ensure   => $service_ensure,
-      name     => 'mysql',
+      name     => $service_name,
       enable   => $enabled,
-      require  => Package[$wsrep_package_name],
+      require  => Package['galera'],
+      provider => $service_provider,
     }
   }
 }

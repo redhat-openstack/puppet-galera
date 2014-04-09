@@ -38,20 +38,16 @@ bind-address=<%= @wsrep_bind_address %>
 ##
 
 # Full path to wsrep provider library or 'none'
-wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_provider=<%= @wsrep_provider %>
 
 # Provider specific configuration options
 #wsrep_provider_options=
 
 # Logical cluster name. Should be the same for all nodes.
-wsrep_cluster_name="<%= @cluster_name %>"
+wsrep_cluster_name="<%= @wsrep_cluster_name %>"
 
 # Group communication system handle
-<% if @master_ip -%>
-wsrep_cluster_address="gcomm://<%= @master_ip %>"
-<% else -%>
-wsrep_cluster_address="gcomm://"
-<% end -%>
+wsrep_cluster_address="<%= @wsrep_cluster_address %>"
 
 # Human-readable node name (non-unique). Hostname by default.
 #wsrep_node_name=
@@ -114,7 +110,8 @@ wsrep_notify_cmd=
 # State Snapshot Transfer method
 wsrep_sst_method=<%= @wsrep_sst_method %>
 
-# Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
+# Address which donor should send State Snapshot to.
+# Should be the address of THIS node. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)
 #wsrep_sst_receive_address=
 
@@ -124,6 +121,9 @@ wsrep_sst_auth=<%= @wsrep_sst_username %>:<%= @wsrep_sst_password %>
 
 # Desired SST donor name.
 #wsrep_sst_donor=
+
+# Reject client queries when donating SST (false)
+#wsrep_sst_donor_rejects_queries=0
 
 # Protocol version to use
 # wsrep_protocol_version=

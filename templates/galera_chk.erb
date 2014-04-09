@@ -2,8 +2,8 @@
 #
 ######## This file is managed by Puppet ##########
 #
-# This script checks if a mysql server is healthy running on localhost. It will
-# return:
+# This script checks if a mysql server is healthy running on localhost.
+# It will return:
 # "HTTP/1.x 200 OK\r" (if mysql is running smoothly)
 # - OR -
 # "HTTP/1.x 500 Internal Server Error\r" (else)
@@ -19,8 +19,9 @@ MYSQL_OPTS="-N -q -A"
 TMP_FILE="/dev/shm/mysqlchk.$$.out"
 ERR_FILE="/dev/shm/mysqlchk.$$.err"
 FORCE_FAIL="/dev/shm/proxyoff"
-MYSQL_BIN="<%= @mysql_bin_dir %>"
+MYSQL_BIN="<%= @mysql_path %>"
 CHECK_QUERY="show global status where variable_name='wsrep_local_state'"
+
 preflight_check()
 {
     for I in "$TMP_FILE" "$ERR_FILE"; do
@@ -36,6 +37,7 @@ preflight_check()
         fi
     done
 }
+
 return_ok()
 {
     echo -e "HTTP/1.1 200 OK\r\n"
@@ -47,6 +49,7 @@ return_ok()
     rm $ERR_FILE $TMP_FILE
     exit 0
 }
+
 return_fail()
 {
     echo -e "HTTP/1.1 503 Service Unavailable\r\n"
@@ -59,19 +62,24 @@ return_fail()
     rm $ERR_FILE $TMP_FILE
     exit 1
 }
+
 preflight_check
+
 if [ -f "$FORCE_FAIL" ]; then
-        echo "$FORCE_FAIL found" > $ERR_FILE
-        return_fail;
+    echo "$FORCE_FAIL found" > $ERR_FILE
+    return_fail;
 fi
+
 $MYSQL_BIN $MYSQL_OPTS --host=$MYSQL_HOST --port=$MYSQL_PORT --user=$MYSQL_USERNAME --password=$MYSQL_PASSWORD -e "$CHECK_QUERY" > $TMP_FILE 2> $ERR_FILE
+
 if [ $? -ne 0 ]; then
-        return_fail;
+    return_fail;
 fi
+
 status=`cat  $TMP_FILE | awk '{print $2;}'`
 
 if [ $status -ne 4 ]; then
-   return_fail;
+    return_fail;
 fi
 
 return_ok;
