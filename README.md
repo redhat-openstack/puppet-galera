@@ -1,35 +1,35 @@
 # Gelera module
 
-This is a module for installing galera.
+This is a module for installing and confiuring galera.
 
-It depends on the mysql module from puppetlabs as
-well as augeas.
-
+It depends on the mysql module from puppetlabs as well as xinetd.
 
 ## Usage
 
-### mysql::server::galera
+### galera::server
 
-Used to deploy and manage a MySQL Galera server cluster.
-Installs wsrep and galera packages, configures wsrep.cnf and starts mysqld service:
+Used to deploy and manage a MariaDB Galera server cluster.
+Installs mariadb-galera-server and galera packages, configures
+galera.cnf and starts mysqld service:
 
-  class { 'mysql::server::galera':
+  class { 'galera::server':
     config_hash => {
-      'root_password' => 'root_pass',
+      bind_address   => '0.0.0.0',
+      default_engine => 'InnoDB',
+      root_password  => 'root_pass',
     },
     cluster_name       => 'galera_cluster',
-    master_ip          => false,
+    wsrep_sst_method   => 'rsync'
     wsrep_sst_username => 'ChangeMe',
     wsrep_sst_password => 'ChangeMe',
-    wsrep_sst_method   => 'rsync'
   }
 
-### mysql::server::galera::monitor
+### galera::monitor
 
-  Used to monitor a MySQL Galera clustered server.
-  The class is meant to be used in a server load-balancer environment.
+  Used to monitor a MariaDB Galera cluster server. The class is meant
+  to be used in a server load-balancer environment.
 
-    class {'mysql::server::galera::monitor':
+    class {'galera::monitor':
       monitor_username => 'mon_user',
       monitor_password => 'mon_pass'
     }
@@ -37,15 +37,14 @@ Installs wsrep and galera packages, configures wsrep.cnf and starts mysqld servi
 Here is a sample 3-node HAProxy Configuration:
 
   listen galera 192.168.220.40:3306
-   balance  leastconn
-   mode  tcp
-   option  tcpka
-   option  httpchk
-   server  control01 192.168.220.41:3306 check port 9200 inter 2000 rise 2 fall 5
-   server  control02 192.168.220.42:3306 check port 9200 inter 2000 rise 2 fall 5
-   server  control03 192.168.220.43:3306 check port 9200 inter 2000 rise 2 fall 5
+    balance leastconn
+    mode    tcp
+    option  tcpka
+    option  httpchk
+    server  control01 192.168.220.41:3306 check port 9200 inter 2000 rise 2 fall 5
+    server  control02 192.168.220.42:3306 check port 9200 inter 2000 rise 2 fall 5
+    server  control03 192.168.220.43:3306 check port 9200 inter 2000 rise 2 fall 5
 
+## Authors
 
-## Author
-
-Daneyon Hansen
+Daneyon Hansen, Ryan O'Hara
