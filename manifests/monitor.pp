@@ -64,9 +64,4 @@ class galera::monitor (
     ensure        => present,
     password_hash => mysql_password($monitor_password),
   }
-
-  database_grant { "${monitor_username}@${monitor_hostname}":
-    privileges => [ 'process_priv', 'super_priv' ],
-    require    => Database_user["${monitor_username}@${monitor_hostname}"],
-  }
 }
