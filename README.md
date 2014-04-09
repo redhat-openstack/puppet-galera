@@ -1,4 +1,4 @@
-# Gelera module
+# Galera module
 
 This is a module for installing and confiuring galera.
 
