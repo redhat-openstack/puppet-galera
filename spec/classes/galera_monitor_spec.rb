@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe 'galera::monitor' do
   let :facts do
-    { :osfamily => 'Debian' }
+    { :osfamily => 'RedHat' }
   end
   let :pre_condition do
     "include 'galera::server'"
@@ -12,9 +12,8 @@ describe 'galera::monitor' do
       :monitor_password    => 'monitor_pass',
       :monitor_hostname    => '127.0.0.1',
       :mysql_port          => '3306',
-      :mysql_bin_dir       => '/usr/bin/mysql',
-      :mysqlchk_script_dir => '/usr/local/bin',
-      :xinetd_dir          => '/etc/xinetd.d',
+      :mysql_path          => '/usr/bin/mysql',
+      :script_dir          => '/usr/local/bin',
       :enabled             => true
     }
   end
@@ -25,7 +24,6 @@ describe 'galera::monitor' do
     )}
 
   it { should contain_file('/usr/local/bin/galera_chk')}
-  it { should contain_file('/etc/xinetd.d/mysqlchk')}
   it { should contain_database_user("monitor_user@127.0.0.1")}
 
 end
