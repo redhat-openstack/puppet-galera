@@ -45,7 +45,7 @@ class galera::monitor (
   }
 
   file { "${script_dir}/galera_chk":
-    mode    => '0755',
+    mode    => '0700',
     require => File[$script_dir],
     content => template("galera/galera_chk.erb"),
     owner   => 'root',
