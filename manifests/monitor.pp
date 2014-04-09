@@ -58,6 +58,7 @@ class galera::monitor (
     flags          => 'REUSE',
     log_on_failure => 'USERID',
     per_source     => 'UNLIMITED',
+    service_type   => 'UNLISTED',
   }
 
   database_user { "${monitor_username}@${monitor_hostname}":
