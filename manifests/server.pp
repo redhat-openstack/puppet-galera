@@ -28,7 +28,7 @@
 #   config_hash => {
 #     'root_password' => 'root_pass',
 #   },
-#   cluster_name       => 'galera_cluster',
+#   wsrep_cluster_name => 'galera_cluster',
 #   wsrep_sst_method   => 'rsync'
 #   wsrep_sst_username => 'ChangeMe',
 #   wsrep_sst_password => 'ChangeMe',
