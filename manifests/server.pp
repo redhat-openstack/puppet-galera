@@ -26,7 +26,9 @@
 # Sample Usage:
 # class { 'galera::server':
 #   config_hash => {
-#     'root_password' => 'root_pass',
+#     bind_address   => '0.0.0.0',
+#     default_engine => 'InnoDB',
+#     root_password  => 'root_pass',
 #   },
 #   wsrep_cluster_name => 'galera_cluster',
 #   wsrep_sst_method   => 'rsync'
@@ -66,6 +68,7 @@ class galera::server (
     owner   => 'root',
     group   => 'root',
     content => template('galera/wsrep.cnf.erb'),
+    require => File_line['includedir'],
     notify  => Service['galera'],
   }
 
@@ -85,5 +88,11 @@ class galera::server (
       require  => Package['galera'],
       provider => $service_provider,
     }
+  }
+
+  file_line { 'includedir':
+    path  => '/etc/my.cnf',
+    line  => '!includedir /etc/my.cnf.d/',
+    match => '^!includedir.*',
   }
 }
