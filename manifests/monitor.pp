@@ -25,7 +25,7 @@ class galera::monitor (
   $mysql_host     = '127.0.0.1',
   $mysql_port     = '3306',
   $monitor_port   = '9200',
-  $monitot_script = '/usr/bin/clustercheck',
+  $monitor_script = '/usr/bin/clustercheck',
   $enabled        = true,
 ) {
 
