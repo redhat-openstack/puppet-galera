@@ -1,13 +1,13 @@
 # Class galera::monitor
 #
 # Parameters:
-#  [*monitor_username*] - Username of the service account used for the galera health chck script.
-#  [*monitor_password*] - Password of the service account used for the galera health chck script.
-#  [*monitor_hostname*] - Hostname/IP address that galera is bound to. Defaults to 127.0.0.1.
-#  [*mysql_port]        - Port used by galera service. Defaults to 3306.
-#  [*mysql_path*]       - Full path to database client binary.
-#  [*script_dir*]       - Directory where galera healthcheck script is located.
-#  [*enabled*]          - Enable/Disable galera::monitor class.
+#  [*mysql_username*] - Username of the service account used for the clustercheck script.
+#  [*mysql_password*] - Password of the service account used for the clustercheck script.
+#  [*mysql_host*]     - Hostname/IP address of mysql server to monitor. Defaults to 127.0.0.1.
+#  [*mysql_port]      - Port used by mysql service. Defaults to 3306.
+#  [*monitor_port*]   - Port used by galera monitor service. Defaults to 9200.
+#  [*monitor_script*] - Full path to monitor script. Defaults to '/usr/bin/clustercheck'.
+#  [*enabled*]        - Enable/Disable galera monitor xinetd::service. Defaults to true.
 #
 # Actions:
 #
@@ -15,54 +15,47 @@
 #
 # Sample usage:
 # class { 'galera::monitor':
-#   monitor_username => 'mon_user',
-#   monitor_password => 'mon_pass'
+#   mysql_username => 'mon_user',
+#   mysql_password => 'mon_pass'
 # }
 #
 class galera::monitor (
-  $monitor_username = 'monitor_user',
-  $monitor_password = 'monitor_pass',
-  $monitor_hostname = '127.0.0.1',
-  $mysql_port       = '3306',
-  $mysql_path       = '/usr/bin/mysql',
-  $script_dir       = '/usr/local/bin',
-  $enabled          = true,
+  $mysql_username = 'monitor_user',
+  $mysql_password = 'monitor_pass',
+  $mysql_host     = '127.0.0.1',
+  $mysql_port     = '3306',
+  $monitor_port   = '9200',
+  $monitot_script = '/usr/bin/clustercheck',
+  $enabled        = true,
 ) {
 
   Class['galera::server'] -> Class['galera::monitor']
 
   if $enabled {
-    $service_ensure = 'running'
+    $monitor_disable = 'no'
   } else {
-    $service_ensure = 'stopped'
+    $monitor_disable = 'yes'
   }
 
-  file { $script_dir:
-    ensure  => directory,
-    mode    => '0755',
+  file { '/etc/sysconfig/clustercheck':
+    mode    => '0640',
+    content => template("galera/clustercheck.erb"),
     owner   => 'root',
     group   => 'root',
   }
 
-  file { "${script_dir}/galera_chk":
-    mode    => '0700',
-    require => File[$script_dir],
-    content => template("galera/galera_chk.erb"),
-    owner   => 'root',
-    group   => 'root',
-  }
-
-  xinetd::service { 'galera-check':
-    port           => '9200',
-    server         => "${script_dir}/galera_chk",
+  xinetd::service { 'galera-monitor':
+    disable        => $monitor_disable,
+    port           => $monitor_port,
+    server         => $monitor_script,
     flags          => 'REUSE',
     log_on_failure => 'USERID',
     per_source     => 'UNLIMITED',
     service_type   => 'UNLISTED',
   }
 
-  database_user { "${monitor_username}@${monitor_hostname}":
-    ensure        => present,
-    password_hash => mysql_password($monitor_password),
+  database_user { "${mysql_username}@${mysql_host}":
+    ensure        => present, 
+    password_hash => mysql_password($mysql_password),
   }
 }
