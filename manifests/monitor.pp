@@ -57,5 +57,6 @@ class galera::monitor (
   database_user { "${mysql_username}@${mysql_host}":
     ensure        => present, 
     password_hash => mysql_password($mysql_password),
+    require       => [File['/root/.my.cnf'],Service['galera']],
   }
 }
