@@ -18,6 +18,8 @@
 #  [*wsrep_sst_method*]      - State snapshot transfer method.
 #  [*wsrep_sst_username*]    - Username used by the wsrep_sst_auth authentication string.
 #  [*wsrep_sst_password*]    - Password used by the wsrep_sst_auth authentication string.
+#  [*wsrep_ssl_key*]         -
+#  [*wsrep_ssl_cert*]        -
 #
 # Actions:
 #
@@ -51,6 +53,8 @@ class galera::server (
   $wsrep_sst_method      = 'rsync',
   $wsrep_sst_username    = 'root',
   $wsrep_sst_password    = undef,
+  $wsrep_ssl_key         = undef,
+  $wsrep_ssl_cert        = undef,
 ) inherits mysql {
 
   $config_class = { 'mysql::config' => $config_hash }
@@ -61,6 +65,14 @@ class galera::server (
     ensure => $package_ensure,
     name   => $package_name,
   }
+
+  $opt_hash = delete_undef_values(
+    {
+      'socket.ssl_key'  => $wsrep_ssl_key,
+      'socket.ssl_cert' => $wsrep_ssl_cert,
+    })
+
+  $wsrep_provider_options = join(join_keys_to_values($opt_hash, '='), "; ")
 
   file { '/etc/my.cnf.d/galera.cnf':
     ensure  => present,
