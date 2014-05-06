@@ -7,6 +7,7 @@
 #  [*config_hash*]           - Hash of config parameters that need to be set.
 #  [*enabled*]               - Defaults to true, boolean to set service ensure.
 #  [*manage_service*]        - Boolean dictating if galera::server should manage the service.
+#  [*bootstrap*]             - Defaults to false, boolean to set cluster boostrap.
 #  [*package_ensure*]        - Ensure state for package. Can be specified as version.
 #  [*package_name*]          - The name of the galera package.
 #  [*service_name*]          - The name of the galera service.
@@ -42,6 +43,7 @@ class galera::server (
   $config_hash           = {},
   $enabled               = true,
   $manage_service        = true,
+  $bootstrap             = false,
   $package_ensure        = 'present',
   $package_name          = 'mariadb-galera-server',
   $service_name          = $mysql::params::service_name,
