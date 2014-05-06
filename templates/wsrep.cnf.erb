@@ -47,7 +47,7 @@ wsrep_provider_options="<%= @wsrep_provider_options %>"
 wsrep_cluster_name="<%= @wsrep_cluster_name %>"
 
 # Group communication system handle
-wsrep_cluster_address="<%= @wsrep_cluster_address %>"
+wsrep_cluster_address="gcomm://<%= @wsrep_cluster_members.join ',' %>"
 
 # Human-readable node name (non-unique). Hostname by default.
 #wsrep_node_name=

@@ -14,7 +14,7 @@
 #  [*wsrep_bind_address*]    - Address to bind galera service.
 #  [*wsrep_provider*]        - Full path to wsrep provider library or 'none'.
 #  [*wsrep_cluster_name*]    - Logical cluster name. Should be the same for all nodes.
-#  [*wsrep_cluster_address*] - Group communication system handle.
+#  [*wsrep_cluster_members*] - List of cluster members, IP addresses or hostnames.
 #  [*wsrep_sst_method*]      - State snapshot transfer method.
 #  [*wsrep_sst_username*]    - Username used by the wsrep_sst_auth authentication string.
 #  [*wsrep_sst_password*]    - Password used by the wsrep_sst_auth authentication string.
@@ -49,7 +49,7 @@ class galera::server (
   $wsrep_bind_address    = '0.0.0.0',
   $wsrep_provider        = '/usr/lib64/galera/libgalera_smm.so',
   $wsrep_cluster_name    = 'galera_cluster',
-  $wsrep_cluster_address = 'gcomm://',
+  $wsrep_cluster_members = [ $::ipaddress ],
   $wsrep_sst_method      = 'rsync',
   $wsrep_sst_username    = 'root',
   $wsrep_sst_password    = undef,
