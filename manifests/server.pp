@@ -18,8 +18,8 @@
 #  [*wsrep_sst_method*]      - State snapshot transfer method.
 #  [*wsrep_sst_username*]    - Username used by the wsrep_sst_auth authentication string.
 #  [*wsrep_sst_password*]    - Password used by the wsrep_sst_auth authentication string.
-#  [*wsrep_ssl_key*]         -
-#  [*wsrep_ssl_cert*]        -
+#  [*wsrep_ssl_key*]         - A private key for the certificate above, unencrypted, in PEM format.
+#  [*wsrep_ssl_cert*]        - Certificate file in PEM format.
 #
 # Actions:
 #
