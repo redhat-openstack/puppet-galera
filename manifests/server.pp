@@ -70,14 +70,11 @@ class galera::server (
     name   => $package_name,
   }
 
-  $opt_hash = delete_undef_values(
-    {
-      'socket.ssl'      => $wsrep_ssl,
-      'socket.ssl_key'  => $wsrep_ssl_key,
-      'socket.ssl_cert' => $wsrep_ssl_cert,
-    })
-
-  $wsrep_provider_options = join(join_keys_to_values($opt_hash, '='), "; ")
+  $wsrep_provider_options = wsrep_options({
+    'socket.ssl'      => $wsrep_ssl,
+    'socket.ssl_key'  => $wsrep_ssl_key,
+    'socket.ssl_cert' => $wsrep_ssl_cert,
+  })
 
   file { '/etc/my.cnf.d/galera.cnf':
     ensure  => present,

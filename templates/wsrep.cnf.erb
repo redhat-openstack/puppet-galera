@@ -41,7 +41,7 @@ bind-address=<%= @wsrep_bind_address %>
 wsrep_provider=<%= @wsrep_provider %>
 
 # Provider specific configuration options
-wsrep_provider_options="<%= @wsrep_provider_options %>"
+wsrep_provider_options="<%= @wsrep_provider_options.join '; ' %>"
 
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name="<%= @wsrep_cluster_name %>"
