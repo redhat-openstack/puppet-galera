@@ -82,7 +82,6 @@ class galera::server (
     owner   => 'root',
     group   => 'root',
     content => template('galera/wsrep.cnf.erb'),
-    require => File_line['includedir'],
     notify  => Service['galera'],
   }
 
@@ -102,11 +101,5 @@ class galera::server (
       require  => Package['galera'],
       provider => $service_provider,
     }
-  }
-
-  file_line { 'includedir':
-    path  => '/etc/my.cnf',
-    line  => '!includedir /etc/my.cnf.d/',
-    match => '^!includedir.*',
   }
 }
