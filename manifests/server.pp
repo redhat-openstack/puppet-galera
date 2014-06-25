@@ -45,6 +45,7 @@ class galera::server (
   $enabled               = true,
   $manage_service        = true,
   $bootstrap             = false,
+  $debug                 = false,
   $package_ensure        = 'present',
   $package_name          = 'mariadb-galera-server',
   $service_name          = $mysql::params::service_name,
@@ -75,6 +76,8 @@ class galera::server (
     'socket.ssl_key'  => $wsrep_ssl_key,
     'socket.ssl_cert' => $wsrep_ssl_cert,
   })
+
+  $wsrep_debug = bool2num($debug)
 
   file { '/etc/my.cnf.d/galera.cnf':
     ensure  => present,
