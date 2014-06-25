@@ -45,13 +45,16 @@ class galera::monitor (
   }
 
   xinetd::service { 'galera-monitor':
-    disable        => $monitor_disable,
-    port           => $monitor_port,
-    server         => $monitor_script,
-    flags          => 'REUSE',
-    log_on_failure => 'USERID',
-    per_source     => 'UNLIMITED',
-    service_type   => 'UNLISTED',
+    disable                 => $monitor_disable,
+    port                    => $monitor_port,
+    server                  => $monitor_script,
+    flags                   => 'REUSE',
+    per_source              => 'UNLIMITED',
+    service_type            => 'UNLISTED',
+    log_on_success          => '',
+    log_on_success_operator => '=',
+    log_on_failure          => 'HOST',
+    log_on_failure_operator => '=',
   }
 
   database_user { "${mysql_username}@${mysql_host}":
