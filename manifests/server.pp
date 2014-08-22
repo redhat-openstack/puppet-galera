@@ -5,12 +5,12 @@
 #
 # Parameters:
 #  [*config_hash*]           - Hash of config parameters that need to be set.
-#  [*enabled*]               - Defaults to true, boolean to set service ensure.
-#  [*manage_service*]        - Boolean dictating if galera::server should manage the service.
 #  [*bootstrap*]             - Defaults to false, boolean to set cluster boostrap.
-#  [*package_ensure*]        - Ensure state for package. Can be specified as version.
 #  [*package_name*]          - The name of the galera package.
+#  [*package_ensure*]        - Ensure state for package. Can be specified as version.
 #  [*service_name*]          - The name of the galera service.
+#  [*service_enable*]        - Defaults to true, boolean to set service enable.
+#  [*service_ensure*]        - Defaults to running, needed to set root password.
 #  [*service_provider*]      - What service provider to use.
 #  [*wsrep_bind_address*]    - Address to bind galera service.
 #  [*wsrep_provider*]        - Full path to wsrep provider library or 'none'.
@@ -42,13 +42,13 @@
 #
 class galera::server (
   $config_hash           = {},
-  $enabled               = true,
-  $manage_service        = true,
   $bootstrap             = false,
   $debug                 = false,
-  $package_ensure        = 'present',
   $package_name          = 'mariadb-galera-server',
+  $package_ensure        = 'present',
   $service_name          = $mysql::params::service_name,
+  $service_enable        = true,
+  $service_ensure        = 'running',
   $service_provider      = $mysql::params::service_provider,
   $wsrep_bind_address    = '0.0.0.0',
   $wsrep_provider        = '/usr/lib64/galera/libgalera_smm.so',
@@ -67,8 +67,8 @@ class galera::server (
   create_resources( 'class', $config_class )
 
   package { 'galera':
-    ensure => $package_ensure,
     name   => $package_name,
+    ensure => $package_ensure,
   }
 
   $wsrep_provider_options = wsrep_options({
@@ -88,21 +88,13 @@ class galera::server (
     notify  => Service['galera'],
   }
 
-  if $enabled {
-    $service_ensure = 'running'
-  } else {
-    $service_ensure = 'stopped'
-  }
+  Service['galera'] -> Exec<| title == 'set_mysql_rootpw' |>
 
-  if $manage_service {
-    Service['galera'] -> Exec<| title == 'set_mysql_rootpw' |>
-
-    service { 'galera':
-      ensure   => $service_ensure,
-      name     => $service_name,
-      enable   => $enabled,
-      require  => Package['galera'],
-      provider => $service_provider,
-    }
+  service { 'galera':
+    name     => $service_name,
+    enable   => $service_enable,
+    ensure   => $service_ensure,
+    require  => Package['galera'],
+    provider => $service_provider,
   }
 }

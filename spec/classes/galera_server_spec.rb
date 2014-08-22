@@ -5,11 +5,11 @@ describe 'galera::server' do
   end
   let :params do
     {
-      :enabled               => true,
-      :manage_service        => true,
-      :package_ensure        => 'present',
       :package_name          => 'mariadb-galera-server',
+      :package_ensure        => 'present',
       :service_name          => 'mariadb',
+      :service_enable        => false,
+      :service_ensure        => 'running',
       :wsrep_bind_address    => '0.0.0.0',
       :wsrep_provider        => '/usr/lib64/galera/libgalera_smm.so',
       :wsrep_cluster_name    => 'galera_cluster',
