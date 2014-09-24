@@ -49,7 +49,7 @@ wsrep_cluster_name="<%= @wsrep_cluster_name %>"
 # Group communication system handle
 <% if @bootstrap -%>
 wsrep_cluster_address="gcomm://"
-<% else -%>
+<% elsif !@wsrep_cluster_members.empty? -%>
 wsrep_cluster_address="gcomm://<%= @wsrep_cluster_members.join ',' %>"
 <% end -%>
 
