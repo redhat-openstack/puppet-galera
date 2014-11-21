@@ -7,5 +7,5 @@ summary 'Install/configure MariaDB with Galera'
 description 'Install/configure MariaDB with Galera'
 project_page 'https://github.com/rohara/puppet-galera'
 
-dependency 'puppetlabs/mysql', '>= 0.5.0'
+dependency 'puppetlabs/mysql', '>= 2.3.1'
 dependency 'puppetlabs/xinetd', '>= 1.2.0'
