@@ -1,7 +1,6 @@
 # == Class: galera::server
 #
-# manages the installation of the galera server.
-# manages the package, service, galera.cnf
+# manages the installation and configuration of the galera server and galera.cnf
 #
 # === Parameters:
 #
@@ -10,24 +9,6 @@
 #
 #  [*bootstrap*]
 #   Defaults to false, boolean to set cluster boostrap.
-#
-#  [*package_name*]
-#   The name of the galera package.
-#
-#  [*package_ensure*]
-#   Ensure state for package. Can be specified as version.
-#
-#  [*service_name*]
-#   The name of the galera service.
-#
-#  [*service_enable*]
-#   Defaults to true, boolean to set service enable.
-#
-#  [*service_ensure*]
-#   Defaults to running, needed to set root password.
-#
-#  [*service_provider*]
-#   What service provider to use.
 #
 #  [*wsrep_bind_address*]
 #   Address to bind galera service.
@@ -64,19 +45,25 @@
 #
 #  [*debug*]
 #
-#  [*manage_service*]
-#   State of the service.
-#
 # === Actions:
 #
 # === Requires:
 #
 # === Sample Usage:
 # class { 'galera::server':
-#   config_hash => {
-#     bind_address   => '0.0.0.0',
-#     default_engine => 'InnoDB',
-#     root_password  => 'root_pass',
+#   mysql_server_hash => {
+#     override_options        => {
+#       'mysqld' => {
+#         'bind-address'           => '0.0.0.0',
+#         'default-storage-engine' => 'InnoDB',
+#       }
+#     },
+#     package_name            => 'mariadb-galera-cluster',
+#     service_enabled         => true,
+#     service_manage          => true,
+#     root_password           => 'ChangeMe',
+#     restart                 => false,
+#     remove_default_accounts => true,
 #   },
 #   wsrep_cluster_name => 'galera_cluster',
 #   wsrep_sst_method   => 'rsync'
@@ -87,22 +74,18 @@
 class galera::server (
   $mysql_server_hash     = {},
   $bootstrap             = false,
-  $debug                 = false,
-  $service_name          = 'mariadb',
-  $service_enable        = true,
-  $service_ensure        = 'running',
-  $manage_service        = false,
   $wsrep_bind_address    = '0.0.0.0',
   $wsrep_node_address    = undef,
   $wsrep_provider        = '/usr/lib64/galera/libgalera_smm.so',
   $wsrep_cluster_name    = 'galera_cluster',
-  $wsrep_cluster_members = [ $::ipaddress ],
+  $wsrep_cluster_members = [],
   $wsrep_sst_method      = 'rsync',
   $wsrep_sst_username    = 'root',
   $wsrep_sst_password    = undef,
   $wsrep_ssl             = false,
   $wsrep_ssl_key         = undef,
   $wsrep_ssl_cert        = undef,
+  $debug                 = false,
 )  {
 
   $mysql_server_class = { 'mysql::server' => $mysql_server_hash }
@@ -123,14 +106,6 @@ class galera::server (
     owner   => 'root',
     group   => 'root',
     content => template('galera/wsrep.cnf.erb'),
-    notify  => Service[$service_name],
-  }
-
-  if $manage_service {
-    service { 'galera':
-      ensure => $service_ensure,
-      name   => $service_name,
-      enable => $service_enable,
-    }
+    before  => Service['mysqld'],
   }
 }

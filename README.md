@@ -13,10 +13,19 @@ It depends on the mysql module from puppetlabs as well as xinetd.
   starts mysqld service:
 
     class { 'galera::server':
-      config_hash => {
-        bind_address   => '0.0.0.0',
-        default_engine => 'InnoDB',
-        root_password  => 'root_pass',
+      mysql_server_hash => {
+        override_options        => {
+          'mysqld' => {
+            'bind-address'           => '0.0.0.0',
+            'default-storage-engine' => 'InnoDB',
+          }
+        },
+        package_name            => 'mariadb-galera-cluster',
+        service_enabled         => true,
+        service_manage          => true,
+        root_password           => 'ChangeMe',
+        restart                 => false,
+        remove_default_accounts => true,
       },
       wsrep_cluster_name => 'galera_cluster',
       wsrep_sst_method   => 'rsync'
