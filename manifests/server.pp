@@ -109,11 +109,17 @@ class galera::server (
 
   create_resources( 'class', $mysql_server_class )
 
-  $wsrep_provider_options = wsrep_options({
-    'socket.ssl'      => $wsrep_ssl,
-    'socket.ssl_key'  => $wsrep_ssl_key,
-    'socket.ssl_cert' => $wsrep_ssl_cert,
-  })
+  if $wsrep_ssl {
+    $wsrep_provider_options = wsrep_options({
+      'socket.ssl'      => $wsrep_ssl,
+      'socket.ssl_key'  => $wsrep_ssl_key,
+      'socket.ssl_cert' => $wsrep_ssl_cert,
+    })
+  } else {
+    $wsrep_provider_options = wsrep_options({
+      'socket.ssl'      => $wsrep_ssl,
+    })
+  }
 
   $wsrep_debug = bool2num($debug)
 
