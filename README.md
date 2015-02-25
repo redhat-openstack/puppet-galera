@@ -13,7 +13,7 @@ It depends on the mysql module from puppetlabs as well as xinetd.
   starts mysqld service:
 
     class { 'galera::server':
-      config_hash => {
+      mysql_server_hash => {
         bind_address   => '0.0.0.0',
         default_engine => 'InnoDB',
         root_password  => 'root_pass',
@@ -30,8 +30,8 @@ It depends on the mysql module from puppetlabs as well as xinetd.
   to be used in a server load-balancer environment.
 
     class {'galera::monitor':
-      monitor_username => 'mon_user',
-      monitor_password => 'mon_pass'
+      mysql_username => 'mon_user',
+      mysql_password => 'mon_pass'
     }
 
   Here is a sample 3-node HAProxy Configuration:
