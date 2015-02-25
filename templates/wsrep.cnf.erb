@@ -46,6 +46,15 @@ wsrep_provider_options="<%= @wsrep_provider_options.join '; ' %>"
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name="<%= @wsrep_cluster_name %>"
 
+# Group communication system handle
+<% if @wsrep_cluster_members.empty? -%>
+wsrep_cluster_address="dummy://"
+<% elsif @bootstrap -%>
+wsrep_cluster_address="gcomm://"
+<% else -%>
+wsrep_cluster_address="gcomm://<%= @wsrep_cluster_members.join ',' %>"
+<% end -%>
+
 # Human-readable node name (non-unique). Hostname by default.
 #wsrep_node_name=
 

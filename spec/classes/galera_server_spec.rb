@@ -9,11 +9,6 @@ describe 'galera::server', :type => :class do
   let :params do
     {
       :bootstrap             => false,
-      :debug                 => false,
-      :service_name          => 'mariadb',
-      :service_enable        => true,
-      :service_ensure        => 'running',
-      :manage_service        => false,
       :wsrep_bind_address    => '0.0.0.0',
       :wsrep_node_address    => 'undef',
       :wsrep_provider        => '/usr/lib64/galera/libgalera_smm.so',
@@ -25,6 +20,7 @@ describe 'galera::server', :type => :class do
       :wsrep_ssl             => false,
       :wsrep_ssl_key         => 'undef',
       :wsrep_ssl_cert        => 'undef',
+      :debug                 => false,
     }
   end
 
@@ -36,25 +32,8 @@ describe 'galera::server', :type => :class do
       'mode'   => '0644',
       'owner'  => 'root',
       'group'  => 'root',
-      'notify' => 'Service[mariadb]'
+      'before' => 'Service[mysqld]'
       )
     }
-  end
-
-  context 'with manage_service to false' do
-    it "Doesn't configure galera service" do
-      should_not contain_service('galera')
-    end
-  end
-
-  context 'with manage_service to true' do
-    let(:params) { {:manage_service => true} }
-    it "Configures galera service" do
-      should contain_service('galera').with(
-        'ensure' => 'running',
-        'name'   => 'mariadb',
-        'enable' => 'true',
-      )
-    end
   end
 end

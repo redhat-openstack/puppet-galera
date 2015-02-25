@@ -78,13 +78,15 @@ class galera::monitor (
     log_on_success_operator => '=',
     log_on_failure          => 'HOST',
     log_on_failure_operator => '=',
+    # the monitor script is part of the mysql-server package
+    subscribe               => Package['mysql-server'],
   }
 
   if $create_mysql_user {
     mysql_user { "${mysql_username}@${mysql_host}":
       ensure        => present,
       password_hash => mysql_password($mysql_password),
-      require       => [File['/root/.my.cnf'],Service['galera']],
+      require       => [File['/root/.my.cnf'],Service['mysqld']],
     }
   }
 }
