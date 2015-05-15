@@ -28,11 +28,6 @@ innodb_locks_unsafe_for_binlog=1
 #### query_cache_size=0 now in server.cnf
 query_cache_type=0
 
-# Override bind-address
-# In some systems bind-address defaults to 127.0.0.1, and with mysqldump SST
-# it will have (most likely) disastrous consequences on donor node
-bind-address=<%= @wsrep_bind_address %>
-
 ##
 ## WSREP options
 ##
@@ -41,10 +36,14 @@ bind-address=<%= @wsrep_bind_address %>
 wsrep_provider=<%= @wsrep_provider %>
 
 # Provider specific configuration options
-wsrep_provider_options="<%= @wsrep_provider_options.join '; ' %>"
+wsrep_provider_options="<%= @wsrep_provider_options.join '; ' %>;gmcast.listen_addr=tcp://<%= @wsrep_bind_address %>:4567"
 
 # Logical cluster name. Should be the same for all nodes.
 wsrep_cluster_name="<%= @wsrep_cluster_name %>"
+
+<% if @bootstrap -%>
+wsrep_cluster_address="gcomm://<%= @wsrep_cluster_members.join ',' %>?pc.wait_prim=no"
+<% end -%>
 
 # Human-readable node name (non-unique). Hostname by default.
 #wsrep_node_name=

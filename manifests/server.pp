@@ -8,6 +8,10 @@
 #  [*bootstrap*]
 #   Defaults to false, boolean to set cluster boostrap.
 #
+#  [*root_password*]
+#   Defaults to undef, root password used to bootstrap wsrep.
+#   Needed only on first node in wsrep_cluster_members.
+#
 #  [*package_name*]
 #   The name of the galera package.
 #
@@ -48,7 +52,6 @@
 #
 #  [*wsrep_bind_address*]
 #   Address to bind galera service.
-#   Deprecated, please use ::mysql::server class.
 #
 #  [*mysql_server_hash*]
 #   Hash of mysql server parameters.
@@ -89,9 +92,11 @@
 #
 class galera::server (
   $bootstrap             = false,
+  $root_password         = undef,
   $debug                 = false,
   $wsrep_node_address    = undef,
   $wsrep_provider        = '/usr/lib64/galera/libgalera_smm.so',
+  $wsrep_bind_address    = '0.0.0.0',
   $wsrep_cluster_name    = 'galera_cluster',
   $wsrep_cluster_members = [ $::ipaddress ],
   $wsrep_sst_method      = 'rsync',
@@ -103,7 +108,6 @@ class galera::server (
   $create_mysql_resource = true,
   # DEPRECATED OPTIONS
   $mysql_server_hash     = {},
-  $wsrep_bind_address    = '0.0.0.0',
   $manage_service        = false,
   $service_name          = 'mariadb',
   $service_enable        = true,
@@ -115,10 +119,6 @@ class galera::server (
     $mysql_server_class = { 'mysql::server' => $mysql_server_hash }
 
     create_resources( 'class', $mysql_server_class )
-  }
-
-  if $wsrep_bind_address {
-    warning("DEPRECATED: wsrep_bind_address is deprecated, you should use bind_address of mysql module")
   }
 
   $wsrep_provider_options = wsrep_options({
@@ -136,6 +136,23 @@ class galera::server (
     group   => 'root',
     content => template('galera/wsrep.cnf.erb'),
     notify  => Service['mysqld'],
+  }
+
+  if $bootstrap {
+    if $wsrep_node_address == $wsrep_cluster_members[0] {
+      if $root_password {
+        exec 'turn-on-primary':
+          onlyif      => "/bin/mysql -sNu root --password=${root_password} -e \"SHOW GLOBAL STATUS WHERE Variable_name='wsrep_cluster_status';\" | /bin/grep 'non-Primary'",
+          refreshonly => true,
+          command     => "/bin/mysql -sNu root --password=${root_password} -e \"SET GLOBAL wsrep_provider_options='pc.bootstrap=1';\"",
+          subscribe   => Service['mysqld'],
+          notify      => Class['mysql::server::root_password'],
+      } else {
+        fail("\$root_password not set for bootstrap")
+      }
+    } else {
+      warning("\$bootstrap was set to true, yet this node \$wsrep_node_address does not seem to be first node in \$wsrep_cluster_members (${wsrep_node_address} != [${wsrep_cluster_members}]0)")
+    }
   }
 
   if $manage_service {
